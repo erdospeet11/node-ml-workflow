@@ -1,0 +1,63 @@
+manage workflows, make integration with external services easy
+
+- data input
+    - file upload
+    - database
+    - api
+- process
+    - functions
+    - train model: labelling, evaluation, inference
+    - deploy model
+    - monitor model
+    - update model
+    - delete model
+    - model versioning
+    - model history
+    - model comparison
+    - model performance
+- data output
+    - file download
+    - database
+    - api
+    - email
+    - slack
+    - webhook
+    - notification
+    - alert
+    - log
+    - metric
+    - dashboard
+    - report
+    - visualization
+    - dashboard
+
+- integration with azure, aws, gcp
+- llm nodes: openai, anthropic, gemini
+- download trained model
+- docker container support for engines
+
+1st version:
+    - data input: input an array of numbers in the browser app
+    - process: apply function to the data -> sum of the numbers
+    - data output: display the result in the canvas log
+
+    - should we have some king of engine in process?
+
+    - in the end, we have flow that we can run
+
+
+Roadmap:
+- add nodes to the canvas
+    - input node
+    - process nodes
+    - output nodes
+    - library for nodes
+- context for nodes
+- be able to run flows
+- overview of flows
+
+
+Examples:
+ - sum of numbers (input numbers node, sum function node, output result node)
+ - simple llm flow (input prompt node, llm function node, output result node)
+ - batch processing
