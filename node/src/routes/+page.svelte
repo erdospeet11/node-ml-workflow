@@ -1,5 +1,5 @@
-<script>
-  import { SvelteFlow, Background, Controls, Position } from '@xyflow/svelte';
+<script lang="ts">
+  import { SvelteFlow, Background, Controls, Position, type ColorMode } from '@xyflow/svelte';
 
   import '@xyflow/svelte/dist/style.css';
 
@@ -53,11 +53,13 @@
       target: '4',
     },
   ]);
+
+  let colorMode: ColorMode = $state('dark');
 </script>
 
 <div style:width="100vw" style:height="100vh">
-  <SvelteFlow bind:nodes bind:edges>
-    <Background/>
-    <Controls/>
-  </SvelteFlow>
+	<SvelteFlow bind:nodes bind:edges>
+		<Background />
+		<Controls />
+	</SvelteFlow>
 </div>
