@@ -140,6 +140,8 @@
        consoleInput = '';
     }
   }
+
+  let showDashboard = $state(false);
 </script>
 
 <div class="flex h-screen w-full bg-neutral-900 text-white overflow-hidden">
@@ -208,118 +210,238 @@
 
 	<!-- Main Content (75% width) -->
 	<main class="w-4/5 h-full relative">
-		<SvelteFlow
-			bind:nodes
-			bind:edges
-			{colorMode}
-			fitView
-			class="bg-neutral-950"
-			onnodecontextmenu={handleNodeContextMenu}
-			onedgecontextmenu={handleEdgeContextMenu}
-			onpaneclick={handlePaneClick}
-		>
-			<Background bgColor="#111" />
-			<Controls />
-			<Panel position="top-center">
-				<div
-					class="flex items-center gap-2 p-1.5 bg-neutral-800/80 backdrop-blur border border-neutral-700 rounded-lg shadow-lg"
-				>
-					<button
-						class="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-md transition-colors font-medium text-sm"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3" /></svg
-						>
-						Run
-					</button>
-					<div class="w-px h-6 bg-neutral-700 mx-1"></div>
-					<button
-						class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors"
-						title="Settings"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="lucide lucide-settings"
-							><path
-								d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
-							/><circle cx="12" cy="12" r="3" /></svg
-						>
-					</button>
-					<button
-						class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors"
-						title="Share"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="lucide lucide-share-2"
-							><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle
-								cx="18"
-								cy="19"
-								r="3"
-							/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49" /><line
-								x1="15.41"
-								x2="8.59"
-								y1="6.51"
-								y2="10.49"
-							/></svg
-						>
-					</button>
-					<button
-						class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors {showConsole
-							? 'text-green-400 bg-neutral-700/50'
-							: ''}"
-						title="Console"
-						onclick={() => (showConsole = !showConsole)}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="lucide lucide-terminal-square"
-							><path d="m7 11 2-2-2-2" /><path d="M11 13h4" /><rect
-								width="18"
-								height="18"
-								x="3"
-								y="3"
-								rx="2"
-								ry="2"
-							/></svg
-						>
-					</button>
+		{#if !showDashboard}
+			<SvelteFlow
+				bind:nodes
+				bind:edges
+				{colorMode}
+				fitView
+				class="bg-neutral-950"
+				onnodecontextmenu={handleNodeContextMenu}
+				onedgecontextmenu={handleEdgeContextMenu}
+				onpaneclick={handlePaneClick}
+			>
+				<Background bgColor="#111" />
+				<Controls />
+			</SvelteFlow>
+		{:else}
+			<div class="w-full h-full overflow-y-auto bg-neutral-950 p-8">
+				<div class="max-w-6xl mx-auto">
+					<h1 class="text-3xl font-bold mb-8">System Dashboard</h1>
+
+					<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						{#each [{ label: 'Total Requests', value: '1.2M', change: '+12%', color: 'blue' }, { label: 'Active Users', value: '42.5k', change: '+5%', color: 'green' }, { label: 'Avg Latency', value: '45ms', change: '-2%', color: 'purple' }, { label: 'Error Rate', value: '0.01%', change: '-0.05%', color: 'red' }] as stat}
+							<div class="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl">
+								<div class="text-neutral-400 text-sm mb-1">{stat.label}</div>
+								<div class="flex items-end gap-2">
+									<div class="text-2xl font-bold">{stat.value}</div>
+									<div
+										class="text-xs mb-1 {stat.change.startsWith('+')
+											? 'text-green-400'
+											: 'text-red-400'}"
+									>
+										{stat.change}
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+						<div class="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl h-80">
+							<h3 class="font-medium mb-4 text-neutral-300">Throughput History</h3>
+							<div class="w-full h-full flex items-end justify-between px-2 pb-8 gap-2">
+								{#each Array(20) as _, i}
+									<div
+										class="w-full bg-blue-500/20 hover:bg-blue-500/40 transition-colors rounded-t-sm relative group"
+										style="height: {30 + Math.random() * 70}%"
+									>
+										<div
+											class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-neutral-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10"
+										>
+											{Math.floor(Math.random() * 1000)} req/s
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+						<div class="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl h-80">
+							<h3 class="font-medium mb-4 text-neutral-300">Resource Usage</h3>
+							<div class="space-y-4">
+								{#each ['CPU Core 1', 'CPU Core 2', 'Memory', 'Disk I/O', 'Network'] as resource}
+									<div>
+										<div class="flex justify-between text-xs mb-1">
+											<span class="text-neutral-400">{resource}</span>
+											<span class="text-neutral-300">{Math.floor(Math.random() * 100)}%</span>
+										</div>
+										<div class="w-full bg-neutral-800 h-2 rounded-full overflow-hidden">
+											<div
+												class="bg-purple-500 h-full rounded-full"
+												style="width: {Math.random() * 100}%"
+											></div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+
+					<div class="bg-neutral-900/50 border border-neutral-800 rounded-xl overflow-hidden">
+						<div class="p-6 border-b border-neutral-800">
+							<h3 class="font-medium text-neutral-300">Detailed Logs</h3>
+						</div>
+						<div class="divide-y divide-neutral-800/50">
+							{#each Array(5) as _, i}
+								<div class="p-4 flex items-center gap-4 hover:bg-neutral-800/30 transition-colors">
+									<div
+										class="w-2 h-2 rounded-full {['bg-green-500', 'bg-blue-500', 'bg-yellow-500'][
+											i % 3
+										]}"
+									></div>
+									<div class="flex-1 text-sm text-neutral-300">
+										System update successfully completed for module core-pk-{i}
+									</div>
+									<div class="text-xs text-neutral-500 font-mono">10:2{i}:45 AM</div>
+								</div>
+							{/each}
+						</div>
+					</div>
 				</div>
-			</Panel>
-		</SvelteFlow>
+			</div>
+		{/if}
+
+		<div class="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+			<div
+				class="flex items-center gap-2 p-1.5 bg-neutral-800/80 backdrop-blur border border-neutral-700 rounded-lg shadow-lg"
+			>
+				<button
+					class="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-md transition-colors font-medium text-sm"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3" /></svg
+					>
+					Run
+				</button>
+				<button
+					class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-md transition-colors font-medium text-sm {showDashboard
+						? 'ring-2 ring-purple-400'
+						: ''}"
+					onclick={() => (showDashboard = !showDashboard)}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-layout-dashboard"
+						><rect width="7" height="9" x="3" y="3" rx="1" /><rect
+							width="7"
+							height="5"
+							x="14"
+							y="3"
+							rx="1"
+						/><rect width="7" height="9" x="14" y="12" rx="1" /><rect
+							width="7"
+							height="5"
+							x="3"
+							y="16"
+							rx="1"
+						/></svg
+					>
+					Dash
+				</button>
+				<div class="w-px h-6 bg-neutral-700 mx-1"></div>
+				<button
+					class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors"
+					title="Settings"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-settings"
+						><path
+							d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+						/><circle cx="12" cy="12" r="3" /></svg
+					>
+				</button>
+				<button
+					class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors"
+					title="Share"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-share-2"
+						><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle
+							cx="18"
+							cy="19"
+							r="3"
+						/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49" /><line
+							x1="15.41"
+							x2="8.59"
+							y1="6.51"
+							y2="10.49"
+						/></svg
+					>
+				</button>
+				<button
+					class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors {showConsole
+						? 'text-green-400 bg-neutral-700/50'
+						: ''}"
+					title="Console"
+					onclick={() => (showConsole = !showConsole)}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-terminal-square"
+						><path d="m7 11 2-2-2-2" /><path d="M11 13h4" /><rect
+							width="18"
+							height="18"
+							x="3"
+							y="3"
+							rx="2"
+							ry="2"
+						/></svg
+					>
+				</button>
+			</div>
+		</div>
 		{#if menu}
 			<div
 				class="fixed z-50 bg-neutral-800 border border-neutral-700 rounded-md shadow-xl py-1 transform -translate-y-0 min-w-[140px]"
