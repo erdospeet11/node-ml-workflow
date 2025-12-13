@@ -120,6 +120,26 @@
 
     menu = null;
   }
+
+  let showConsole = $state(false);
+  let consoleInput = $state('');
+  let consoleLogs = $state([
+    '> Initializing console...',
+    '> Connected to local backend service',
+    '> Ready for events'
+  ]);
+
+  function handleConsoleSubmit() {
+    if (consoleInput.trim()) {
+       consoleLogs = [...consoleLogs, `> ${consoleInput}`];
+
+       const cmd = consoleInput;
+       setTimeout(() => {
+           consoleLogs = [...consoleLogs, `> executed: ${cmd}`];
+       }, 100);
+       consoleInput = '';
+    }
+  }
 </script>
 
 <div class="flex h-screen w-full bg-neutral-900 text-white overflow-hidden">
@@ -269,6 +289,34 @@
 							/></svg
 						>
 					</button>
+					<button
+						class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-md transition-colors {showConsole
+							? 'text-green-400 bg-neutral-700/50'
+							: ''}"
+						title="Console"
+						onclick={() => (showConsole = !showConsole)}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-terminal-square"
+							><path d="m7 11 2-2-2-2" /><path d="M11 13h4" /><rect
+								width="18"
+								height="18"
+								x="3"
+								y="3"
+								rx="2"
+								ry="2"
+							/></svg
+						>
+					</button>
 				</div>
 			</Panel>
 		</SvelteFlow>
@@ -300,6 +348,73 @@
 					>
 					Delete {menu.type}
 				</button>
+			</div>
+		{/if}
+
+		{#if showConsole}
+			<div
+				class="absolute bottom-4 right-4 w-96 h-64 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl flex flex-col overflow-hidden z-50"
+			>
+				<div
+					class="flex items-center justify-between px-3 py-2 bg-neutral-800 border-b border-neutral-700"
+				>
+					<span class="flex items-center gap-2 text-xs font-mono text-neutral-400">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="12"
+							height="12"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-terminal"
+							><polyline points="4 17 10 11 4 5" /><line x1="12" x2="20" y1="19" y2="19" /></svg
+						>
+						Backend Console
+					</span>
+					<button
+						class="text-neutral-500 hover:text-white"
+						aria-label="Close console"
+						onclick={() => (showConsole = false)}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+						>
+					</button>
+				</div>
+				<div
+					class="flex-1 p-3 font-mono text-xs text-green-400 overflow-y-auto bg-black/50 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent"
+				>
+					{#each consoleLogs as log}
+						<div class="mb-0.5 opacity-80 font-mono">{log}</div>
+					{/each}
+				</div>
+				<form
+					class="flex items-center gap-2 px-2 py-1.5 bg-neutral-950 border-t border-neutral-800"
+					onsubmit={(e) => {
+						e.preventDefault();
+						handleConsoleSubmit();
+					}}
+				>
+					<span class="text-green-500 font-bold text-xs">➜</span>
+					<input
+						type="text"
+						class="flex-1 bg-transparent border-none outline-none text-xs font-mono text-white placeholder-neutral-600 focus:ring-0 p-0"
+						placeholder="Type command..."
+						bind:value={consoleInput}
+					/>
+				</form>
 			</div>
 		{/if}
 	</main>

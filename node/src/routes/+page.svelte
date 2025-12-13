@@ -30,7 +30,7 @@
 		<div
 			class="text-2xl font-bold tracking-tight bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent"
 		>
-			FlowNode
+			CosmicFlow
 		</div>
 		<div class="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
 			<a href="#features" class="hover:text-white transition-colors">Features</a>

@@ -3,9 +3,6 @@ Purpose of the app: manage your machine learning models, workflows, training, in
 manage workflows, make integration with external services easy
 
 
-
-
-
 - data input
     - file upload
     - database
@@ -61,7 +58,6 @@ Roadmap:
 - context for nodes
 - be able to run flows
 - overview of flows
-
 
 Examples:
  - sum of numbers (input numbers node, sum function node, output result node)
