@@ -1,4 +1,10 @@
+Purpose of the app: manage your machine learning models, workflows, training, inference, deployment, monitoring, logging, metrics, dashboards, reporting, visualization locally and in the cloud. add databasem, llm, azure, aws, gcp integrations
+
 manage workflows, make integration with external services easy
+
+
+
+
 
 - data input
     - file upload
@@ -61,3 +67,6 @@ Examples:
  - sum of numbers (input numbers node, sum function node, output result node)
  - simple llm flow (input prompt node, llm function node, output result node)
  - batch processing
+
+- [ ] add dashboard integration
+- [ ] add file processing for the backend
