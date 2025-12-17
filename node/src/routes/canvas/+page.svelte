@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { SvelteFlow, Background, Controls, Panel, Position, type ColorMode, type Node, type Edge } from '@xyflow/svelte';
+  import { SvelteFlow, Background, Controls, Panel, Position, type ColorMode, type Node, type Edge, useSvelteFlow, SvelteFlowProvider } from '@xyflow/svelte';
+  import CustomNode from '$lib/components/CustomNode.svelte';
+  import { nodeTemplates, type NodeTemplate } from '$lib/nodeTemplates';
 
   import '@xyflow/svelte/dist/style.css';
 
   const nodeDefaults = {
     sourcePosition: Position.Right,
     targetPosition: Position.Left,
+  };
+
+  const nodeTypes = {
+    custom: CustomNode,
   };
 
   //Mock data for now
@@ -34,8 +40,34 @@
         },
         {
           id: '4',
+          type: 'custom',
           position: { x: 250, y: 300 },
-          data: { label: 'default style 4' },
+          data: { 
+            label: 'Configurable Node',
+            inputs: 2,
+            outputs: 3,
+            params: [
+              { label: 'Max Output', value: 100, type: 'number' },
+              { label: 'Prefix', value: 'MK-', type: 'text' }
+            ],
+            textInput: 'Initial configuration notes...'
+          },
+          ...nodeDefaults,
+        },
+        {
+          id: '5',
+          type: 'custom',
+          position: { x: 550, y: 150 },
+          data: { 
+            label: 'Data Source',
+            inputs: 0,
+            outputs: 1,
+            params: [
+              { label: 'Connection String', value: 'mysql://localhost:3306', type: 'text' },
+              { label: 'Timeout (ms)', value: 5000, type: 'number' }
+            ],
+            textInput: 'Primary database connection'
+          },
           ...nodeDefaults,
         },
       ],
@@ -82,7 +114,14 @@
 
   let colorMode: ColorMode = $state('dark');
 
-  let menu = $state<{ id: string; top: number; left: number; type: 'node' | 'edge' } | null>(null);
+  // Menu state updated to include 'canvas' type and mouse data
+  let menu = $state<{ 
+    id: string; 
+    top: number; 
+    left: number; 
+    type: 'node' | 'edge' | 'canvas'; 
+    event?: MouseEvent; // Keep reference to generic event if needed
+  } | null>(null);
 
   function handleNodeContextMenu({ event, node }: { event: MouseEvent; node: Node }) {
     event.preventDefault();
@@ -103,6 +142,17 @@
       type: 'edge',
     };
   }
+  
+  function handlePaneContextMenu({ event }: { event: MouseEvent }) {
+    event.preventDefault();
+    menu = {
+        id: 'pane',
+        top: event.clientY,
+        left: event.clientX,
+        type: 'canvas',
+        event,
+    };
+  }
 
   function handlePaneClick() {
     menu = null;
@@ -118,6 +168,28 @@
       edges = edges.filter((e) => e.id !== menu!.id);
     }
 
+    menu = null;
+  }
+  
+  function handleAddNode(template: NodeTemplate) {
+    if (!menu) return;
+    
+    const id = `${Date.now()}`;
+    const newNode = {
+        id,
+        type: 'custom',
+        position: { x: menu.left - 200, y: menu.top - 50 },
+        data: {
+            label: template.defaultLabel || template.label,
+            inputs: template.inputs,
+            outputs: template.outputs,
+            params: template.params.map(p => ({...p})),
+            textInput: template.defaultTextInput || ''
+        },
+        ...nodeDefaults
+    };
+    
+    nodes = [...nodes, newNode];
     menu = null;
   }
 
@@ -214,12 +286,16 @@
 			<SvelteFlow
 				bind:nodes
 				bind:edges
+				{nodeTypes}
 				{colorMode}
 				fitView
 				class="bg-neutral-950"
 				onnodecontextmenu={handleNodeContextMenu}
 				onedgecontextmenu={handleEdgeContextMenu}
+				onpanecontextmenu={handlePaneContextMenu}
 				onpaneclick={handlePaneClick}
+				panOnDrag={[1]}
+				selectionOnDrag={true}
 			>
 				<Background bgColor="#111" />
 				<Controls />
@@ -449,27 +525,55 @@
 				role="menu"
 				tabindex="-1"
 			>
-				<button
-					class="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-900/30 text-red-500 hover:text-red-400 transition-colors text-sm text-left"
-					onclick={handleDelete}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-trash-2"
-						><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
-							d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-						/><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg
+				{#if menu.type === 'canvas'}
+					<div
+						class="px-3 py-1 text-xs font-semibold text-neutral-500 uppercase tracking-wider border-b border-neutral-700 mb-1"
 					>
-					Delete {menu.type}
-				</button>
+						Add Node
+					</div>
+					{#each nodeTemplates as template}
+						<button
+							class="flex items-center gap-2 w-full px-3 py-2 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors text-sm text-left"
+							onclick={() => handleAddNode(template)}
+						>
+							<div class="flex flex-col">
+								<span class="font-medium">{template.label}</span>
+								{#if template.description}
+									<span class="text-[10px] text-neutral-500 line-clamp-1"
+										>{template.description}</span
+									>
+								{/if}
+							</div>
+						</button>
+					{/each}
+				{:else}
+					<button
+						class="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-900/30 text-red-500 hover:text-red-400 transition-colors text-sm text-left"
+						onclick={handleDelete}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-trash-2"
+							><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
+								d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+							/><line x1="10" x2="10" y1="11" y2="17" /><line
+								x1="14"
+								x2="14"
+								y1="11"
+								y2="17"
+							/></svg
+						>
+						Delete {menu.type}
+					</button>
+				{/if}
 			</div>
 		{/if}
 

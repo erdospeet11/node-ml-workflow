@@ -181,9 +181,9 @@
 		>
 			<p>&copy; 2024 FlowNode Inc. All rights reserved.</p>
 			<div class="flex gap-6">
-				<a href="#" class="hover:text-green-400 transition-colors">Privacy</a>
-				<a href="#" class="hover:text-green-400 transition-colors">Terms</a>
-				<a href="#" class="hover:text-green-400 transition-colors">Twitter</a>
+				<a href="/" class="hover:text-green-400 transition-colors">Privacy</a>
+				<a href="/" class="hover:text-green-400 transition-colors">Terms</a>
+				<a href="/" class="hover:text-green-400 transition-colors">Twitter</a>
 			</div>
 		</div>
 	</footer>
