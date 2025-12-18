@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,9 +27,28 @@ func getAlbums(c *gin.Context) {
     c.IndentedJSON(http.StatusOK, albums)
 }
 
+func getFlowContext() gin.H {
+    return gin.H{
+        "nodes": []gin.H{},
+        "edges": []gin.H{},
+    }
+}
+
+func postRunFlow(c *gin.Context) {
+    var flowData gin.H
+    if err := c.BindJSON(&flowData); err != nil {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    fmt.Println("Received flow data:")
+    fmt.Printf("%+v\n", flowData)
+    c.IndentedJSON(http.StatusOK, gin.H{"message": "Flow data received"})
+}
+
 func main() {
     router := gin.Default()
     router.GET("/albums", getAlbums)
+    router.POST("/run-flow", postRunFlow)
 
     router.Run("localhost:8080")
 }

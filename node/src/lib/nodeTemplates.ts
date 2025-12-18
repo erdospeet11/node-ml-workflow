@@ -58,7 +58,7 @@ export const nodeTemplates: NodeTemplate[] = [
         label: 'Filter',
         description: 'Filters data based on a condition.',
         inputs: 1,
-        outputs: 2,
+        outputs: 1,
         defaultLabel: 'Filter',
         params: [
             { label: 'Field', value: 'status', type: 'text' },

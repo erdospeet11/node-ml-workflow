@@ -188,9 +188,20 @@
         },
         ...nodeDefaults
     };
+
     
     nodes = [...nodes, newNode];
     menu = null;
+  }
+
+  function runFlow() {
+    fetch('/run-flow', {
+        method: 'POST',
+        body: JSON.stringify({ nodes, edges }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
   }
 
   let showConsole = $state(false);
@@ -392,6 +403,7 @@
 			>
 				<button
 					class="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-md transition-colors font-medium text-sm"
+					onclick={runFlow}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
