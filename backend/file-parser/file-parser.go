@@ -1,0 +1,5 @@
+package fileparser
+
+import (
+	"fmt"
+)

@@ -3,6 +3,11 @@ Purpose of the app: manage your machine learning models, workflows, training, in
 manage workflows, make integration with external services easy
 
 
+1. create a flow that takes in data from the storage repository and processes it
+2. train a model through the nodes (also monitor, deploy, visualization) 
+3. llm integration
+4. yaml translation
+
 - data input
     - file upload
     - database
@@ -64,5 +69,14 @@ Examples:
  - simple llm flow (input prompt node, llm function node, output result node)
  - batch processing
 
+## TODO
+
 - [ ] add dashboard integration
 - [ ] add file processing for the backend
+
+## PLAN
+- ability to parse various data from the user into a dedicated user storage repository
+    - the user has a storage folder
+    - maybe in the left side we can have a file browser that accesses the user's storage repository
+- simple models that parse in data
+    - it should be a node 
