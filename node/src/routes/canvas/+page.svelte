@@ -14,8 +14,7 @@
     custom: CustomNode,
   };
 
-  //Mock data for now
-  const workflows = [
+  let workflows = $state([
     {
       id: '1',
       name: 'Default Workflow',
@@ -90,7 +89,7 @@
         { id: 'eB-C', source: 'B', target: 'C' },
       ],
     },
-  ];
+  ]);
 
   let selectedWorkflowId = $state(workflows[0].id);
 
@@ -112,15 +111,26 @@
     }
   }
 
+  function handleNewWorkflow() {
+    const id = crypto.randomUUID();
+    const newWorkflow = {
+      id,
+      name: `Workflow ${workflows.length + 1}`,
+      nodes: [],
+      edges: [],
+    };
+    workflows = [...workflows, newWorkflow];
+    handleWorkflowSelect(id);
+  }
+
   let colorMode: ColorMode = $state('dark');
 
-  // Menu state updated to include 'canvas' type and mouse data
   let menu = $state<{ 
     id: string; 
     top: number; 
     left: number; 
-    type: 'node' | 'edge' | 'canvas'; 
-    event?: MouseEvent; // Keep reference to generic event if needed
+    type: 'node' | 'edge' | 'canvas' | 'workflow'; 
+    event?: MouseEvent;
   } | null>(null);
 
   function handleNodeContextMenu({ event, node }: { event: MouseEvent; node: Node }) {
@@ -130,6 +140,16 @@
       top: event.clientY,
       left: event.clientX,
       type: 'node',
+    };
+  }
+
+  function handleWorkflowMenu(event: MouseEvent, id: string) {
+    event.stopPropagation();
+    menu = {
+        id,
+        top: event.clientY,
+        left: event.clientX,
+        type: 'workflow'
     };
   }
 
@@ -166,6 +186,17 @@
       edges = edges.filter((e) => e.source !== menu!.id && e.target !== menu!.id);
     } else if (menu.type === 'edge') {
       edges = edges.filter((e) => e.id !== menu!.id);
+    } else if (menu.type === 'workflow') {
+       workflows = workflows.filter(w => w.id !== menu!.id);
+       if (selectedWorkflowId === menu!.id) {
+           if (workflows.length > 0) {
+               handleWorkflowSelect(workflows[0].id);
+           } else {
+               nodes = [];
+               edges = [];
+               selectedWorkflowId = '';
+           }
+       }
     }
 
     menu = null;
@@ -254,23 +285,52 @@
 			</button>
 			<button
 				class="flex items-center gap-2 w-full px-3 py-2 rounded-md border border-neutral-700 hover:bg-neutral-800 transition-colors text-sm text-left text-white"
+				onclick={handleNewWorkflow}
 			>
 				<span class="text-xl leading-none">+</span>
 				<span>New workflow</span>
 			</button>
 		</div>
 
-		<!-- Workflow List -->
 		<div class="flex-1 overflow-y-auto px-2 py-2">
 			<div class="text-xs font-semibold text-neutral-500 px-2 py-2">Your Workflows</div>
 			{#each workflows as wf}
-				<button
-					class="w-full text-left px-3 py-2 rounded-md transition-colors text-sm truncate flex items-center gap-2
-          {selectedWorkflowId === wf.id ? 'bg-neutral-800' : 'hover:bg-neutral-800'}"
-					onclick={() => handleWorkflowSelect(wf.id)}
+				<div
+					class="group flex items-center w-full rounded-md transition-colors {selectedWorkflowId ===
+					wf.id
+						? 'bg-neutral-800'
+						: 'hover:bg-neutral-800'} pr-1 mb-1"
 				>
-					<span class="truncate">{wf.name}</span>
-				</button>
+					<button
+						class="flex-1 text-left px-3 py-2 text-sm truncate bg-transparent border-none outline-none cursor-pointer"
+						onclick={() => handleWorkflowSelect(wf.id)}
+					>
+						<span class="truncate">{wf.name}</span>
+					</button>
+					<button
+						class="p-1 text-neutral-400 hover:text-white rounded hover:bg-neutral-700/50 opacity-0 group-hover:opacity-100 transition-all"
+						onclick={(e) => handleWorkflowMenu(e, wf.id)}
+						title="Workflow options"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-more-horizontal"
+							><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle
+								cx="5"
+								cy="12"
+								r="1"
+							/></svg
+						>
+					</button>
+				</div>
 			{/each}
 		</div>
 
@@ -558,6 +618,33 @@
 							</div>
 						</button>
 					{/each}
+				{:else if menu.type === 'workflow'}
+					<button
+						class="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-900/30 text-red-500 hover:text-red-400 transition-colors text-sm text-left"
+						onclick={handleDelete}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-trash-2"
+							><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
+								d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+							/><line x1="10" x2="10" y1="11" y2="17" /><line
+								x1="14"
+								x2="14"
+								y1="11"
+								y2="17"
+							/></svg
+						>
+						Delete Workflow
+					</button>
 				{:else}
 					<button
 						class="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-900/30 text-red-500 hover:text-red-400 transition-colors text-sm text-left"
