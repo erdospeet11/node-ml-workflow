@@ -256,6 +256,7 @@
   }
 
   let showDashboard = $state(false);
+  let showRegistry = $state(false);
 </script>
 
 <div class="flex h-screen w-full bg-neutral-900 text-white overflow-hidden">
@@ -353,25 +354,7 @@
 
 	<!-- Main Content (75% width) -->
 	<main class="w-4/5 h-full relative">
-		{#if !showDashboard}
-			<SvelteFlow
-				bind:nodes
-				bind:edges
-				{nodeTypes}
-				{colorMode}
-				fitView
-				class="bg-neutral-950"
-				onnodecontextmenu={handleNodeContextMenu}
-				onedgecontextmenu={handleEdgeContextMenu}
-				onpanecontextmenu={handlePaneContextMenu}
-				onpaneclick={handlePaneClick}
-				panOnDrag={[1]}
-				selectionOnDrag={true}
-			>
-				<Background bgColor="#111" />
-				<Controls />
-			</SvelteFlow>
-		{:else}
+		{#if showDashboard}
 			<div class="w-full h-full overflow-y-auto bg-neutral-950 p-8">
 				<div class="max-w-6xl mx-auto">
 					<h1 class="text-3xl font-bold mb-8">System Dashboard</h1>
@@ -455,6 +438,84 @@
 					</div>
 				</div>
 			</div>
+		{:else if showRegistry}
+			<div class="w-full h-full overflow-y-auto bg-neutral-950 p-8">
+				<div class="max-w-6xl mx-auto">
+					<div class="flex items-center justify-between mb-8">
+						<h1 class="text-3xl font-bold">Module Registry</h1>
+						<div class="flex gap-2">
+							<input
+								type="text"
+								placeholder="Search modules..."
+								class="bg-neutral-900 border border-neutral-800 rounded-md px-4 py-2 text-sm focus:outline-none focus:border-neutral-700 w-64"
+							/>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{#each [{ name: 'PostgreSQL Connector', version: '1.2.0', downloads: '12k', author: 'Official', description: 'Connect to PostgreSQL databases with native support for query building.' }, { name: 'OpenAI API', version: '2.1.0', downloads: '8.5k', author: 'Community', description: 'Integrate GPT-4 and other models directly into your workflow.' }, { name: 'Slack Bot', version: '1.0.5', downloads: '3.2k', author: 'Slack', description: 'Send notifications and interact with Slack channels.' }, { name: 'Email Parser', version: '0.9.2', downloads: '1.2k', author: 'UtilsInc', description: 'Extract data from incoming emails using regex and patterns.' }, { name: 'CSV Export', version: '1.1.0', downloads: '45k', author: 'Official', description: 'Export your data streams to CSV format.' }, { name: 'Cron Trigger', version: '1.0.0', downloads: '22k', author: 'System', description: 'Schedule workflows to run at specific time intervals.' }] as module}
+							<div
+								class="bg-neutral-900/50 border border-neutral-800 p-6 rounded-xl hover:border-neutral-700 transition-colors group"
+							>
+								<div class="flex justify-between items-start mb-4">
+									<div
+										class="w-10 h-10 rounded-lg bg-gradient-to-br from-neutral-800 to-neutral-700 flex items-center justify-center text-xl font-bold"
+									>
+										{module.name[0]}
+									</div>
+									<button
+										class="text-xs bg-neutral-800 hover:bg-white hover:text-black px-3 py-1 rounded-full transition-colors font-medium"
+									>
+										Install
+									</button>
+								</div>
+								<h3 class="font-bold text-lg mb-1">{module.name}</h3>
+								<p class="text-neutral-400 text-sm mb-4 h-10 line-clamp-2">{module.description}</p>
+								<div class="flex items-center gap-4 text-xs text-neutral-500">
+									<span class="flex items-center gap-1">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											class="lucide lucide-download"
+											><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline
+												points="7 10 12 15 17 10"
+											/><line x1="12" x2="12" y1="15" y2="3" /></svg
+										>
+										{module.downloads}
+									</span>
+									<span>v{module.version}</span>
+									<span>by {module.author}</span>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			</div>
+		{:else}
+			<SvelteFlow
+				bind:nodes
+				bind:edges
+				{nodeTypes}
+				{colorMode}
+				fitView
+				class="bg-neutral-950"
+				onnodecontextmenu={handleNodeContextMenu}
+				onedgecontextmenu={handleEdgeContextMenu}
+				onpanecontextmenu={handlePaneContextMenu}
+				onpaneclick={handlePaneClick}
+				panOnDrag={[1]}
+				selectionOnDrag={true}
+			>
+				<Background bgColor="#111" />
+				<Controls />
+			</SvelteFlow>
 		{/if}
 
 		<div class="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
@@ -483,7 +544,10 @@
 					class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-md transition-colors font-medium text-sm {showDashboard
 						? 'ring-2 ring-purple-400'
 						: ''}"
-					onclick={() => (showDashboard = !showDashboard)}
+					onclick={() => {
+						showDashboard = !showDashboard;
+						if (showDashboard) showRegistry = false;
+					}}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -511,6 +575,32 @@
 						/></svg
 					>
 					Dash
+				</button>
+				<button
+					class="flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white px-3 py-1.5 rounded-md transition-colors font-medium text-sm {showRegistry
+						? 'ring-2 ring-orange-400'
+						: ''}"
+					onclick={() => {
+						showRegistry = !showRegistry;
+						if (showRegistry) showDashboard = false;
+					}}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-database"
+						><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5V19A9 3 0 0 0 21 19V5" /><path
+							d="M3 12A9 3 0 0 0 21 12"
+						/></svg
+					>
+					Registry
 				</button>
 				<div class="w-px h-6 bg-neutral-700 mx-1"></div>
 				<button

@@ -2,7 +2,6 @@ Purpose of the app: manage your machine learning models, workflows, training, in
 
 manage workflows, make integration with external services easy
 
-
 1. create a flow that takes in data from the storage repository and processes it
 2. train a model through the nodes (also monitor, deploy, visualization) 
 3. llm integration
